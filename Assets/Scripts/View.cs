@@ -9,7 +9,7 @@ public class View : MonoBehaviour
     {
         if (other.GetComponent<Water>() != null)
         {
-            transform.parent.GetComponent<Bunny>().WaterDetected(this, other.transform);
+            transform.parent.GetComponent<Animal>().WaterDetected(this, other.transform);
         }
     }
     

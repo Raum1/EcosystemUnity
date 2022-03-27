@@ -8,6 +8,7 @@ public class Terrain : MonoBehaviour
     [SerializeField] int size;
     [Range(0f, 1f)]
     [SerializeField] float height, scaler;
+    public List<Transform> terrainBlocks = new List<Transform>();
 
     [ContextMenu("CreateMap")]
     void CreateMap()
@@ -22,11 +23,13 @@ public class Terrain : MonoBehaviour
                 {
                     var terrain = Instantiate(water, new Vector3(i * water.localScale.x, .65f, j * water.localScale.z), Quaternion.identity).transform;
                     terrain.parent = transform;
+                    terrainBlocks.Add(terrain);
                 }
                 else
                 {
                     var terrain = Instantiate(grass, new Vector3(i * grass.localScale.x, .75f, j * water.localScale.z), Quaternion.identity).transform;
                     terrain.parent = transform;
+                    terrainBlocks.Add(terrain);
                 }
             }
         }
