@@ -31,7 +31,7 @@ public class Terrain : MonoBehaviour
                     terrain.parent = transform;
                     terrainBlocks.Add(terrain);
                     float perlinNoiseFood = Mathf.PerlinNoise((float)i * scaler * 5f + 7000, (float)j * scaler * 5f + 7000);
-                    if (perlinNoiseFood > 0.75f)
+                    if (perlinNoiseFood > 0.7f)
                     {
                         var foodObj = Instantiate(food, new Vector3(i * grass.localScale.x, .75f, j * water.localScale.z), Quaternion.identity).transform;
                         foodObj.parent = transform;

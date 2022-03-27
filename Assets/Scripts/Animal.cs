@@ -10,19 +10,35 @@ public class Animal : MonoBehaviour
     [SerializeField] SphereCollider view;
     [SerializeField] Activity activity;
     [SerializeField] float speed = 1f;
+    [SerializeField] Material male, female;
+    [SerializeField] GameObject animal;
     public Sex sex;
 
     public float thirst, hungry, age;
     [Range(0, 30)]
     [SerializeField] float minAge, maxAge;
-    float deathAge;
+
+    [Range(0, 30)]
+    [SerializeField] int pergantPeriod, amountOfChildrenMin, amountOfChildrenMax;
+    float deathAge, numOfChildren;
     Vector3 directionMoving;
 
-    public bool isHungry, isThirst, isWantToPair, isMoving;
+    public bool isHungry, isThirst, isWantToPair, hasNoTarget;
+    bool wasPaired, isPergant;
     private void Start()
     {
         view.radius = viewRadius;
         deathAge = Random.Range(minAge, maxAge);
+        if(Random.value > 0.5f)
+            sex = Sex.Female;
+            
+        if (sex == Sex.Male)
+            GetComponent<Renderer>().material = male;
+        else
+            GetComponent<Renderer>().material = female;
+
+        if (sex == Sex.Female)
+            numOfChildren = Random.Range(amountOfChildrenMin, amountOfChildrenMax);
         StartCoroutine(GetDirection());
     }
     void Update()
@@ -35,8 +51,8 @@ public class Animal : MonoBehaviour
             case Activity.Moving:
                 thirst += .5f * Time.deltaTime;
                 hungry += .5f * Time.deltaTime;
-                if (isMoving)
-                    transform.position = Vector3.MoveTowards(transform.position, directionMoving, Time.deltaTime * speed); ;
+                if (hasNoTarget)
+                    transform.position = Vector3.MoveTowards(transform.position, directionMoving, Time.deltaTime * speed);
                 break;
             case Activity.Eating:
                 hungry -= 7.5f * Time.deltaTime;
@@ -44,7 +60,7 @@ public class Animal : MonoBehaviour
                 {
                     hungry = 0;
                     activity = Activity.Moving;
-                    isMoving = true;
+                    hasNoTarget = true;
                 }
                 break;
             case Activity.Drinking:
@@ -53,38 +69,74 @@ public class Animal : MonoBehaviour
                 {
                     thirst = 0;
                     activity = Activity.Moving;
-                    isMoving = true;
+                    hasNoTarget = true;
                 }
                 break;
             case Activity.Pairing:
                 isWantToPair = false;
-                //soon
+                wasPaired = true;
+                hasNoTarget = true;
+                StartCoroutine(Pairing());
+                if (sex == Sex.Female && !isPergant)
+                    StartCoroutine(Pergant(pergantPeriod));
                 break;
 
         }
         if (thirst > 20f)
         {
             isThirst = true;
-            if (thirst > 40)
+            if (thirst > 40f)
             {
-                Death();
+                Destroy(gameObject);
             }
         }
         if (hungry > 30f)
         {
             isHungry = true;
-            if (thirst > 50f)
+            if (hungry > 50f)
             {
-                Death();
+                Destroy(gameObject);
             }
+        }
+        if (age > 1.5f && age < 2.5f && !wasPaired)
+            isWantToPair = true;
+
+        if (age > maxAge)
+            Destroy(gameObject);
+    }
+
+    private void OnValidate()
+    {
+        if (sex == Sex.Male)
+            GetComponent<Renderer>().material = male;
+        else
+            GetComponent<Renderer>().material = female;
+    }
+
+    private void OnCollisionExit(Collision other)
+    {
+        if (other.gameObject.GetComponent<Food>() != null)
+        {
+            other.gameObject.GetComponent<Food>().foodParts--;
+            if (other.gameObject.GetComponent<Food>().foodParts <= 0)
+                Destroy(other.gameObject);
         }
     }
 
-    private void OnCollisionExit(Collision other) {
-        if(other.gameObject.GetComponent<Food>() != null){
-            other.gameObject.GetComponent<Food>().foodParts--;
-            if(other.gameObject.GetComponent<Food>().foodParts <= 0)
-                Destroy(other.gameObject);
+    IEnumerator Pairing()
+    {
+        yield return new WaitForSeconds(5f);
+        activity = Activity.Moving;
+    }
+    IEnumerator Pergant(float pergantPeriod)
+    {
+        Debug.Log(numOfChildren);
+        isPergant = true;
+        yield return new WaitForSeconds(pergantPeriod);
+        for (int i = 0; i < numOfChildren; i++)
+        {
+            var newAnimal = Instantiate(animal, transform.position, Quaternion.identity);
+            
         }
     }
 
@@ -92,8 +144,8 @@ public class Animal : MonoBehaviour
     {
         if (isThirst)
         {
-            isMoving = false;
-            transform.position = Vector3.MoveTowards(transform.position, waterPosition.position, Time.deltaTime * speed/2f);
+            hasNoTarget = false;
+            transform.position = Vector3.MoveTowards(transform.position, waterPosition.position, Time.deltaTime * speed / 2f);
             float distance = Mathf.Abs((waterPosition.position - transform.position).magnitude);
             if (distance < 3f)
             {
@@ -106,13 +158,26 @@ public class Animal : MonoBehaviour
     {
         if (isHungry)
         {
-            isMoving = false;
-            transform.position = Vector3.MoveTowards(transform.position, foodPosition.position, Time.deltaTime * speed/2f);
+            hasNoTarget = false;
+            transform.position = Vector3.MoveTowards(transform.position, foodPosition.position, Time.deltaTime * speed / 2f);
             float distance = Mathf.Abs((foodPosition.position - transform.position).magnitude);
             if (distance < 0.80f)
             {
                 isHungry = false;
                 activity = Activity.Eating;
+            }
+        }
+    }
+    public void PairDetected(View view, Transform pairPosition)
+    {
+        if (isWantToPair)
+        {
+            hasNoTarget = false;
+            transform.position = Vector3.MoveTowards(transform.position, pairPosition.position, Time.deltaTime * speed / 2f);
+            float distance = Mathf.Abs((pairPosition.position - transform.position).magnitude);
+            if (distance < 1.2f)
+            {
+                activity = Activity.Pairing;
             }
         }
     }
@@ -127,8 +192,9 @@ public class Animal : MonoBehaviour
         {
             Vector3 directionMoving = Random.insideUnitCircle.normalized;
             this.directionMoving = new Vector3(directionMoving.x * 4f, 0f, directionMoving.y * 4f) + transform.position;
-            Debug.Log(this.directionMoving);
             yield return new WaitForSeconds(3f);
         }
     }
+
+
 }
