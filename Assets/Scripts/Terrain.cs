@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Terrain : MonoBehaviour
 {
-    [SerializeField] Transform grass, water;
+    [SerializeField] Transform grass, water, food;
     [SerializeField] int size;
     [Range(0f, 1f)]
     [SerializeField] float height, scaler;
@@ -30,6 +30,13 @@ public class Terrain : MonoBehaviour
                     var terrain = Instantiate(grass, new Vector3(i * grass.localScale.x, .75f, j * water.localScale.z), Quaternion.identity).transform;
                     terrain.parent = transform;
                     terrainBlocks.Add(terrain);
+                    float perlinNoiseFood = Mathf.PerlinNoise((float)i * scaler * 5f + 7000, (float)j * scaler * 5f + 7000);
+                    if (perlinNoiseFood > 0.75f)
+                    {
+                        var foodObj = Instantiate(food, new Vector3(i * grass.localScale.x, .75f, j * water.localScale.z), Quaternion.identity).transform;
+                        foodObj.parent = transform;
+
+                    }
                 }
             }
         }
@@ -37,16 +44,23 @@ public class Terrain : MonoBehaviour
     [ContextMenu("DestroyTerrain")]
     private void DestroyTerrain()
     {
+        terrainBlocks = new List<Transform>();
         var oldObjects = FindObjectsOfType<TerrainBlock>();
         foreach (var oldObject in oldObjects)
         {
             DestroyImmediate(oldObject.gameObject);
         }
+        var oldFood = FindObjectsOfType<Food>();
+        foreach (var food in oldFood)
+        {
+            DestroyImmediate(food.gameObject);
+        }
     }
 
-    private void OnValidate() {
-        if(size <= 20)
+    private void OnValidate()
+    {
+        if (size <= 20)
             CreateMap();
     }
-    
+
 }

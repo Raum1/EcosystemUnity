@@ -11,6 +11,10 @@ public class View : MonoBehaviour
         {
             transform.parent.GetComponent<Animal>().WaterDetected(this, other.transform);
         }
+        else if (other.GetComponent<Food>() != null)
+        {
+            transform.parent.GetComponent<Animal>().FoodDetected(this, other.transform);
+        }
     }
     
 }

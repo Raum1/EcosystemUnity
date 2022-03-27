@@ -80,6 +80,14 @@ public class Animal : MonoBehaviour
         }
     }
 
+    private void OnCollisionExit(Collision other) {
+        if(other.gameObject.GetComponent<Food>() != null){
+            other.gameObject.GetComponent<Food>().foodParts--;
+            if(other.gameObject.GetComponent<Food>().foodParts <= 0)
+                Destroy(other.gameObject);
+        }
+    }
+
     public void WaterDetected(View view, Transform waterPosition)
     {
         if (isThirst)
@@ -91,6 +99,20 @@ public class Animal : MonoBehaviour
             {
                 isThirst = false;
                 activity = Activity.Drinking;
+            }
+        }
+    }
+    public void FoodDetected(View view, Transform foodPosition)
+    {
+        if (isHungry)
+        {
+            isMoving = false;
+            transform.position = Vector3.MoveTowards(transform.position, foodPosition.position, Time.deltaTime * speed/2f);
+            float distance = Mathf.Abs((foodPosition.position - transform.position).magnitude);
+            if (distance < 0.80f)
+            {
+                isHungry = false;
+                activity = Activity.Eating;
             }
         }
     }
