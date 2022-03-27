@@ -29,9 +29,9 @@ public class Animal : MonoBehaviour
     {
         view.radius = viewRadius;
         deathAge = Random.Range(minAge, maxAge);
-        if(Random.value > 0.5f)
+        if(Random.value > 0.65f)
             sex = Sex.Female;
-            
+
         if (sex == Sex.Male)
             GetComponent<Renderer>().material = male;
         else
