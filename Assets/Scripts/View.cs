@@ -8,7 +8,7 @@ public class View : MonoBehaviour
 
     List<Water> waterList = new List<Water>();
     List<Food> foodList = new List<Food>();
-    private void OnTriggerStay(Collider other)
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (other.GetComponent<Water>() != null)
         {
@@ -30,7 +30,7 @@ public class View : MonoBehaviour
                     parent.GetComponent<Animal>().PairDetected(this, other.transform);
         }
     }
-    private void OnTriggerExit(Collider other)
+    private void OnTriggerExit2D(Collider2D other)
     {
         waterList = new List<Water>();
         foodList = new List<Food>();

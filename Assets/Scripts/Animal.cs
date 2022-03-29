@@ -7,10 +7,10 @@ public enum Activity { Moving, Eating, Drinking, Pairing }
 public class Animal : MonoBehaviour
 {
     [SerializeField] float viewRadius;
-    [SerializeField] SphereCollider view;
+    [SerializeField] CircleCollider2D view;
     [SerializeField] Activity activity;
     [SerializeField] float speed = 1f;
-    [SerializeField] Material male, female;
+    [SerializeField] Color male, female;
     [SerializeField] GameObject animal;
     public Sex sex;
 
@@ -33,9 +33,9 @@ public class Animal : MonoBehaviour
             sex = Sex.Female;
 
         if (sex == Sex.Male)
-            GetComponent<Renderer>().material = male;
+            GetComponent<SpriteRenderer>().color = male;
         else
-            GetComponent<Renderer>().material = female;
+            GetComponent<SpriteRenderer>().color  = female;
 
         if (sex == Sex.Female)
             numOfChildren = Random.Range(amountOfChildrenMin, amountOfChildrenMax);
@@ -108,20 +108,20 @@ public class Animal : MonoBehaviour
     private void OnValidate()
     {
         if (sex == Sex.Male)
-            GetComponent<Renderer>().material = male;
+            GetComponent<SpriteRenderer>().color = male;
         else
-            GetComponent<Renderer>().material = female;
+            GetComponent<SpriteRenderer>().color = female;
     }
 
-    private void OnCollisionExit(Collision other)
+    private void OnCollisionExit2D(Collision2D other)
     {
         if (other.gameObject.GetComponent<Food>() != null)
         {
             other.gameObject.GetComponent<Food>().foodParts--;
             if (other.gameObject.GetComponent<Food>().foodParts <= 0)
             {
-                other.gameObject.GetComponent<MeshRenderer>().enabled = false;
-                other.gameObject.GetComponent<BoxCollider>().enabled = false;
+                other.gameObject.GetComponent<SpriteRenderer>().enabled = false;
+                other.gameObject.GetComponent<BoxCollider2D>().enabled = false;
             }
         }
     }
@@ -194,7 +194,7 @@ public class Animal : MonoBehaviour
         while (true)
         {
             Vector3 directionMoving = Random.insideUnitCircle.normalized;
-            this.directionMoving = new Vector3(directionMoving.x * 4f, 0f, directionMoving.y * 4f) + transform.position;
+            this.directionMoving = new Vector3(directionMoving.x * 4f, directionMoving.y * 4f) + transform.position;
             yield return new WaitForSeconds(3f);
         }
     }

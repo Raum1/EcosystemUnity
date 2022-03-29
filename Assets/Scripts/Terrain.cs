@@ -21,19 +21,19 @@ public class Terrain : MonoBehaviour
                 float perlinNoise = Mathf.PerlinNoise((float)i * scaler, (float)j * scaler);
                 if (perlinNoise > height)
                 {
-                    var terrain = Instantiate(water, new Vector3(i * water.localScale.x, .65f, j * water.localScale.z), Quaternion.identity).transform;
+                    var terrain = Instantiate(water, new Vector2(i * water.localScale.x, j * water.localScale.y), Quaternion.identity).transform;
                     terrain.parent = transform;
                     terrainBlocks.Add(terrain);
                 }
                 else
                 {
-                    var terrain = Instantiate(grass, new Vector3(i * grass.localScale.x, .75f, j * water.localScale.z), Quaternion.identity).transform;
+                    var terrain = Instantiate(grass, new Vector2(i * grass.localScale.x, j * water.localScale.y), Quaternion.identity).transform;
                     terrain.parent = transform;
                     terrainBlocks.Add(terrain);
                     float perlinNoiseFood = Mathf.PerlinNoise((float)i * scaler * 5f + 7000, (float)j * scaler * 5f + 7000);
                     if (perlinNoiseFood > 0.7f)
                     {
-                        var foodObj = Instantiate(food, new Vector3(i * grass.localScale.x, .75f, j * water.localScale.z), Quaternion.identity).transform;
+                        var foodObj = Instantiate(food, new Vector2(i * grass.localScale.x, j * water.localScale.y), Quaternion.identity).transform;
                         foodObj.parent = transform;
 
                     }
