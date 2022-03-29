@@ -29,7 +29,7 @@ public class Animal : MonoBehaviour
     {
         view.radius = viewRadius;
         deathAge = Random.Range(minAge, maxAge);
-        if(Random.value > 0.65f)
+        if (Random.value > 0.65f)
             sex = Sex.Female;
 
         if (sex == Sex.Male)
@@ -119,7 +119,10 @@ public class Animal : MonoBehaviour
         {
             other.gameObject.GetComponent<Food>().foodParts--;
             if (other.gameObject.GetComponent<Food>().foodParts <= 0)
-                Destroy(other.gameObject);
+            {
+                other.gameObject.GetComponent<MeshRenderer>().enabled = false;
+                other.gameObject.GetComponent<BoxCollider>().enabled = false;
+            }
         }
     }
 
@@ -136,7 +139,7 @@ public class Animal : MonoBehaviour
         for (int i = 0; i < numOfChildren; i++)
         {
             var newAnimal = Instantiate(animal, transform.position, Quaternion.identity);
-            
+
         }
     }
 
@@ -145,7 +148,7 @@ public class Animal : MonoBehaviour
         if (isThirst)
         {
             hasNoTarget = false;
-            transform.position = Vector3.MoveTowards(transform.position, waterPosition.position, Time.deltaTime * speed / 2f);
+            transform.position = Vector3.MoveTowards(transform.position, waterPosition.position, Time.deltaTime * speed / 23f);
             float distance = Mathf.Abs((waterPosition.position - transform.position).magnitude);
             if (distance < 3f)
             {
@@ -159,9 +162,9 @@ public class Animal : MonoBehaviour
         if (isHungry)
         {
             hasNoTarget = false;
-            transform.position = Vector3.MoveTowards(transform.position, foodPosition.position, Time.deltaTime * speed / 2f);
+            transform.position = Vector3.MoveTowards(transform.position, foodPosition.position, Time.deltaTime * speed / 5f);
             float distance = Mathf.Abs((foodPosition.position - transform.position).magnitude);
-            if (distance < 0.80f)
+            if (distance < 1.2f)
             {
                 isHungry = false;
                 activity = Activity.Eating;
